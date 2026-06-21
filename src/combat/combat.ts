@@ -50,6 +50,7 @@ export function runCombat(combatants: Character[]): CombatResult {
     if (standing.length <= 1) break;
 
     rounds++;
+    events.push({ type: "roundStarted", round: rounds });
 
     for (const entry of [...initiativeOrder]) {
       const attacker = entry.character;
@@ -86,12 +87,14 @@ export function runCombat(combatants: Character[]): CombatResult {
         const damageResult = Dice.roll(attacker.damageExpression);
         target.currentHp = Math.max(0, target.currentHp - damageResult.total);
 
+        const maxHp = target.maxHp;
         events.push({
           type: "damageDealt",
           attackerName: attacker.name,
           defenderName: target.name,
           damage: damageResult.total,
           hpRemaining: target.currentHp,
+          maxHp,
         });
 
         if (target.currentHp <= 0) {

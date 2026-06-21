@@ -34,11 +34,17 @@ export interface DamageDealtEvent {
   defenderName: string;
   damage: number;
   hpRemaining: number;
+  maxHp: number;
 }
 
 export interface CombatantDefeatedEvent {
   type: "combatantDefeated";
   combatantName: string;
+}
+
+export interface RoundStartedEvent {
+  type: "roundStarted";
+  round: number;
 }
 
 export interface CombatEndedEvent {
@@ -54,4 +60,5 @@ export type CombatEvent =
   | MissEvent
   | DamageDealtEvent
   | CombatantDefeatedEvent
+  | RoundStartedEvent
   | CombatEndedEvent;

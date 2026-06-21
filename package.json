@@ -5,7 +5,8 @@
   "private": true,
   "scripts": {
     "test": "vitest run",
-    "dev": "tsx src/main.ts"
+    "dev": "tsx src/main.ts",
+    "demo": "tsx src/main.ts"
   },
   "devDependencies": {
     "typescript": "^5.9.3",
