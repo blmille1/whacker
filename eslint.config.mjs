@@ -1,25 +1,15 @@
-// @ts-check
+import tseslint from "typescript-eslint";
 
-import tseslint from "@typescript-eslint/eslint-plugin";
-import tsparser from "@typescript-eslint/parser";
-
-/** @type {import("eslint").Linter.Config[]} */
-export default [
+export default tseslint.config(
   {
-    ignores: ["eslint.config.mjs"],
+    ignores: ["eslint.config.mjs", "vitest.config.ts"],
   },
+  tseslint.configs.strictTypeChecked,
   {
-    plugins: {
-      "@typescript-eslint": tseslint,
-    },
     languageOptions: {
-      parser: tsparser,
       parserOptions: {
         project: "./tsconfig.json",
       },
-    },
-    rules: {
-      ...tseslint.configs.recommended.rules,
     },
   },
   {
@@ -27,6 +17,11 @@ export default [
     rules: {
       "@typescript-eslint/no-explicit-any": "off",
       "@typescript-eslint/no-non-null-assertion": "off",
+      "@typescript-eslint/no-unsafe-argument": "off",
+      "@typescript-eslint/no-unsafe-assignment": "off",
+      "@typescript-eslint/no-unsafe-call": "off",
+      "@typescript-eslint/no-unsafe-member-access": "off",
+      "@typescript-eslint/no-unsafe-return": "off",
     },
   },
-];
+);
