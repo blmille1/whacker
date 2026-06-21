@@ -1,4 +1,4 @@
-import type { CombatEvent } from "./events.js";
+import type { CombatEvent, DamageDealtEvent } from "./events.js";
 
 export function renderEvents(events: CombatEvent[]): string[] {
   const lines: string[] = [];
@@ -34,7 +34,7 @@ export function renderEvents(events: CombatEvent[]): string[] {
         let hpRemaining = 0;
         let maxHp = 0;
         if (hit && i < events.length && events[i].type === "damageDealt") {
-          const dmgEvent = events[i];
+          const dmgEvent = events[i] as DamageDealtEvent;
           damage = dmgEvent.damage;
           hpRemaining = dmgEvent.hpRemaining;
           maxHp = dmgEvent.maxHp;

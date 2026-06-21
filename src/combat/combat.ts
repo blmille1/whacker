@@ -2,6 +2,7 @@ import type { Character } from "../character/character.js";
 import { abilityModifier } from "../character/stats.js";
 import { Dice } from "../dice/dice.js";
 import type { CombatEvent } from "./events.js";
+export type { CombatEvent } from "./events.js";
 
 export interface CombatResult {
   winner: Character[];
@@ -44,11 +45,8 @@ export function runCombat(combatants: Character[]): CombatResult {
   let rounds = 0;
 
   // Combat loop
-  while (true) {
-    const standing = initiativeOrder.filter((e) => e.character.currentHp > 0);
-
-    if (standing.length <= 1) break;
-
+  let standing = initiativeOrder.filter((e) => e.character.currentHp > 0);
+  while (standing.length > 1) {
     rounds++;
     events.push({ type: "roundStarted", round: rounds });
 
@@ -111,6 +109,8 @@ export function runCombat(combatants: Character[]): CombatResult {
         });
       }
     }
+
+    standing = initiativeOrder.filter((e) => e.character.currentHp > 0);
   }
 
   const survivors = initiativeOrder

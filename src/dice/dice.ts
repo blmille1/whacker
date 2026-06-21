@@ -3,8 +3,8 @@ export interface DiceResult {
   rolls: number[];
 }
 
-export class Dice {
-  static roll(expression: string): DiceResult {
+export const Dice = {
+  roll(expression: string): DiceResult {
     const match = expression.match(/^(\d*)d(\d+)([+-]\d+)?$/);
     if (!match) throw new Error(`Invalid dice expression: ${expression}`);
 
@@ -19,5 +19,5 @@ export class Dice {
 
     const total = rolls.reduce((sum, r) => sum + r, 0) + modifier;
     return { total, rolls };
-  }
-}
+  },
+} as const;

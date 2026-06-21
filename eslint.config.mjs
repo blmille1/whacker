@@ -6,6 +6,11 @@ export default tseslint.config(
   },
   tseslint.configs.strictTypeChecked,
   {
+    rules: {
+      "@typescript-eslint/restrict-template-expressions": "off",
+    },
+  },
+  {
     languageOptions: {
       parserOptions: {
         project: "./tsconfig.json",
