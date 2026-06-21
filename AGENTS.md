@@ -6,7 +6,7 @@ Issues are tracked as local markdown files under `.scratch/<feature>/`. See `doc
 
 ### Triage labels
 
-Five canonical labels: `needs-triage`, `needs-info`, `ready-for-agent`, `ready-for-human`, `wontfix`. See `docs/agents/triage-labels.md`.
+Seven labels: `needs-triage`, `needs-info`, `ready-for-agent`, `ready-for-human`, `wontfix`, `in-progress`, `done`. See `docs/agents/triage-labels.md`.
 
 ### Domain docs
 
