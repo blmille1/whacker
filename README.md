@@ -1,18 +1,22 @@
-# Game Concept
+# Whacker
 
-## Project Overview
+A text adventure game engine built first, with plans to generate content later. The game is free and open source software (FOSS).
 
-A non-AI-based text adventure game engine built first, with plans to use AI (via OpenRouter) to generate content later. The game will be free and open source software (FOSS).
+When I was a kid, I wrote a game called Whacker where it was a Rogue vs. a Freeport Guard. It was text only and the user would start the fight and the two would go at it, whacking each other until one won. This is a modern engine inspired by that idea.
 
-## Name Candidates
-Whacker.  When I was a kid, I wrote a game called whacker where it was a Rogue (EvilMatter) vs. a Freeport Guard.  It was text only and the user would start the fight and there the two would go at it, whacking each other until one won.
+## Quick Start
 
-### Top Picks
+Requires **Node.js**.
 
-- **Delve** — short, punchy, evocative
-- **OpenQuest** — simple, clear, FOSS-feeling
-- **Chronicle Engine** — sounds like a real tool
-- **Sword & Source** — FOSS pun + D&D
+```bash
+# Install dependencies
+npm install
+
+# Run the demo (a sample combat between a Fighter and a Goblin)
+npm run demo
+```
+
+The demo runs a turn-by-turn combat with a 6-second pause between rounds so you can watch the action unfold.
 
 ## Ruleset
 
