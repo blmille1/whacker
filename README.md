@@ -16,22 +16,27 @@ Whacker.  When I was a kid, I wrote a game called whacker where it was a Rogue (
 
 ## Ruleset
 
-**D&D 5th Edition under the Systems Reference Document (SRD 5.1) / OGL 1.0a**
+**D&D 2024 under the System Reference Document (SRD 5.2) / CC-BY-4.0**
 
-### Why SRD 5.1?
+### Why SRD 5.2?
 
-- **Free and legal** — Released by Wizards of the Coast under Open Game License
-- **Massive community knowledge** — Everyone knows 5e
-- **Well-documented** — Clean, comprehensive PDF
-- **Proven for digital implementation** — D&D Beyond, Foundry VTT, etc.
+- **CC-BY-4.0 is simpler** — one attribution paragraph, no "Open Game Content" / "Product Identity" distinction, no full license text reproduction required
+- **CC-BY-4.0 is not viral** — downstream users can license their own work however they want
+- **CC-BY-4.0 is irrevocable by design** — survived the 2023 OGL deauthorization attempt through its own structure
+- **SRD 5.2 has more content** — weapon mastery, expanded rules glossary, exploration mechanics, additional species (Goliath), additional backgrounds (Criminal, Sage, Soldier)
+- **SRD 5.2 aligns with 2024/5.5e rules** — the current direction of D&D
 
-### What SRD 5.1 Includes
+### What SRD 5.2 Includes
 
-- 4 core classes (Cleric, Fighter, Rogue, Wizard) with subclasses
-- 4 races (Dwarf, Elf, Halfling, Human)
+- 12 core classes with subclasses
+- 7 species (Dwarf, Elf, Halfling, Human, Goliath, and more)
+- 6 backgrounds (including Criminal, Sage, Soldier)
 - All core spells through 5th level
 - Monster manual subset (100+ monsters)
 - Full combat rules, ability checks, saving throws
+- Weapon mastery mechanics
+- Exploration mechanics
+- Rules glossary
 - Equipment, magic items, conditions
 
 ### Future AI-Generated Content
@@ -51,9 +56,29 @@ Whacker.  When I was a kid, I wrote a game called whacker where it was a Rogue (
 ├── summarizer.ts        # Context compression (future)
 ```
 
+## Architecture
+
+The project is split into two layers:
+
+- **Engine** — a content-agnostic game engine (MIT licensed). Handles combat resolution, character state, dice, and event emission.
+- **Game content** — data and content that plugs into the engine. Lives in clearly marked directories.
+
+This separation means the engine can be extracted into its own package/repo independently of any game content.
+
+## Licensing
+
+| Layer | License | File |
+|-------|---------|------|
+| Code (engine + game code) | MIT | `LICENSE` |
+| SRD 5.2 game content | CC-BY-4.0 | `LICENSE` (attribution section) |
+| Original game content | CC-BY-4.0 | `LICENSE` (declared) |
+
+Game mechanics (ability scores, AC, HP, attack rolls) are not copyrightable. SRD 5.2 content is used under CC-BY-4.0. Original content created for this project is released under CC-BY-4.0.
+
 ## Development Principles
 
 1. Build the engine first — no AI dependency for core gameplay
-2. Use SRD 5.1 as the mechanical foundation
+2. Use SRD 5.2 as the mechanical foundation
 3. Design for AI content injection later (monsters, NPCs, quests, items)
 4. Keep it FOSS and community-friendly
+5. Maintain clean separation between engine code and game content

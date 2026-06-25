@@ -6,7 +6,7 @@ Whacker is a text adventure game engine, but it has no gameplay yet. The namesak
 
 ## Solution
 
-Build a D&D 5e combat engine that takes two or more combatants, runs a complete combat encounter following SRD 5.1 rules, and produces a structured log of events plus a final result. The engine will be domain-organized, tested via its public interface, and designed so that richer narration, AI decision-making, and expanded rules can be layered on later without modifying the core.
+Build a D&D 2024 combat engine that takes two or more combatants, runs a complete combat encounter following SRD 5.2 rules, and produces a structured log of events plus a final result. The engine will be domain-organized, tested via its public interface, and designed so that richer narration, AI decision-making, and expanded rules can be layered on later without modifying the core.
 
 ## User Stories
 
@@ -22,7 +22,7 @@ Build a D&D 5e combat engine that takes two or more combatants, runs a complete 
 10. As a player, I want combat to end when only one side has combatants standing, so that there is a clear winner and loser.
 11. As a developer, I want the combat engine to emit structured events (initiativeRolled, attackMade, hit, miss, damageDealt, combatantDefeated, combatEnded), so that a text renderer or AI system can consume them without coupling to the engine internals.
 12. As a developer, I want the combat engine's public interface to accept an array of combatants and return a result (winner, rounds, event log), so that the entire feature can be tested through a single integration seam.
-13. As a developer, I want to create hardcoded test characters (a Fighter and a Goblin) with SRD-accurate stats, so that I can run a demo combat without a character creation system.
+13. As a developer, I want to create hardcoded test characters (a Fighter and a Goblin) with SRD 5.2-accurate stats, so that I can run a demo combat without a character creation system.
 14. As a player, I want to see a text log of the combat encounter from start to finish, so that I can follow what happened even in this first minimal version.
 
 ## Implementation Decisions
@@ -78,4 +78,4 @@ Build a D&D 5e combat engine that takes two or more combatants, runs a complete 
 
 - This PRD represents the **first vertical slice** of Whacker. Future slices will add character creation, richer combat (advantage, crits, conditions), exploration/rooms, inventory, and eventually AI-generated content via OpenRouter.
 - The event log design is intentional — it's the seam that lets us plug in a narrative text renderer or an AI dungeon master later without touching the combat engine.
-- Hardcoded test characters should use SRD 5.1 stats: Fighter (Longsword, 1d8+STR damage, chain mail AC 16, HP based on d10+CON) and Goblins (Scimitar, 1d6+DEX damage, leather+shield AC 15, HP 2d6).
+- Hardcoded test characters should use SRD 5.2 stats: Fighter (Longsword, 1d8+STR damage, chain mail AC 16, HP based on d10+CON) and Goblins (Scimitar, 1d6+DEX damage, leather+shield AC 15, HP 2d6).

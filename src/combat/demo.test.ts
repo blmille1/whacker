@@ -4,7 +4,7 @@ import { abilityModifier } from "../character/stats.js";
 
 describe("demo characters", () => {
   describe("Fighter", () => {
-    it("has SRD 5.1 ability scores", () => {
+    it("has SRD 5.2 ability scores", () => {
       const fighter = createFighter();
 
       expect(fighter.abilityScores.strength).toBe(16);
@@ -41,7 +41,7 @@ describe("demo characters", () => {
   });
 
   describe("Goblin", () => {
-    it("has SRD 5.1 ability scores", () => {
+    it("has SRD 5.2 ability scores", () => {
       const goblin = createGoblin();
 
       expect(goblin.abilityScores.strength).toBe(8);
