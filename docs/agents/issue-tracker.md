@@ -32,3 +32,18 @@ Create a GitHub issue.
 ## When a skill says "fetch the relevant ticket"
 
 Run `gh issue view <number> --comments`.
+
+## PRD and child issue conventions
+
+Based on mattpocock/sandcastle's pattern:
+
+- **PRD issues** are titled with a `PRD:` prefix (e.g., `PRD: Resume support for the Codex agent provider`). They use the full PRD template: Problem Statement, Solution, User Stories, Implementation Decisions, Testing Decisions, Out of Scope, Further Notes. They do NOT have triage labels (no `ready-for-agent`) — they are planning documents, not work items.
+- **Child issues** (vertical slices / tracer bullets) use the `## Parent` template referencing the PRD issue number, with What to build, Acceptance criteria, Blocked by, and User stories addressed. These get `ready-for-agent`.
+- **Bug/enhancement issues** use a different template: Summary, Location, Symptom, Minimal reproduction, Expected, Actual, Environment.
+- The parent PRD does NOT link back to children — linkage is one-way (child → parent).
+
+## Shell-safe text payloads
+
+When a bash command needs a large text body (`gh issue create`, `git commit -F`, `curl -d`), write to a temp file first and reference it (`--body-file`, `-F`, stdin redirect). Do not inline the content in a command string — backticks and `$` in markdown will be interpreted by the shell even inside quoted heredocs.
+- Bad: `gh issue create --body "$(cat <<'EOF' ...)"` ← fails on backticks
+- Good: `write /tmp/thing.md` then `gh issue create --body-file /tmp/thing.md`

@@ -110,6 +110,10 @@ _Avoid_: tongue, dialect
 A discrete, turn-based fight between two or more Characters with a clear beginning and end. Has an end condition (e.g., one side defeated, all PCs unconscious) and a final state — but no explicit winner field. Who won is derived from the final state, not modeled as data. A Combat is one kind of activity; non-fight activities (exploration, negotiation) are out of scope for now.
 _Avoid_: fight, battle, encounter (use Encounter for the broader concept)
 
+**Intent**:
+A declaration of what a Character wants to do on their Turn, submitted to the engine for resolution. Examples: `{ type: "attack", targetId }`, `{ type: "dash" }`. The engine validates legality via `getLegalIntents` and applies effects via `resolveIntent`. The same interface drives both Player and NPC Turns.
+_Avoid_: action choice, command, move
+
 **Turn**:
 One Character's opportunity to act within a Combat. On a Turn, a Character may move, take an Action, and so on.
 _Avoid_: move (use for Movement), go
@@ -312,9 +316,29 @@ _Avoid_: lair ability, lair power
 A situation the Characters face. A Combat is one kind of Encounter; others include social encounters, traps, puzzles, and exploration challenges. The engine currently models Combat Encounters; other Encounter types are out of scope for now.
 _Avoid_: scene, event, situation
 
+**Combat State**:
+A read-only snapshot of everything needed to render the battlefield: all participants (name, currentHp, maxHp, ac, conditions), current round, whose Turn it is, and combat status (ongoing/ended). The engine produces a fresh snapshot after each state change; the game content layer decides what to display.
+_Avoid_: game state, battle state, world state
+
+**Legal Intents**:
+The set of Intents a given Character can take on their current Turn, returned by `getLegalIntents`. For the first milestone: Attack (requires target), Dash, Dodge, Disengage. The engine decides legality; the game content layer presents choices to the Player.
+_Avoid_: available actions, valid moves, options
+
+**NPC Controller**:
+Game content layer component that chooses Intents for NPC Turns. Calls `getLegalIntents` then selects an Intent (e.g., attack the nearest PC). The engine is NPC-agnostic — it resolves any valid Intent the same way whether it came from a Player or an NPC Controller.
+_Avoid_: AI, bot, enemy logic
+
 **Adventure**:
 A structured series of Encounters forming a complete story arc. Out of scope for now — the engine will eventually support Adventure structure, but the initial build focuses on Combat.
 _Avoid_: quest, mission, campaign
+
+**Engine**:
+The rules layer. Knows how Combat, Actions, Attacks, Damage, and all other mechanics work. Has no opinion about what specific Characters, Monsters, or Encounters exist. Exposes an intent interface (e.g., `{ type: "attack", targetId }`) that the game content layer drives.
+_Avoid_: game logic, systems (too vague)
+
+**Game Content**:
+The data and glue layer. Holds premade Character stat blocks, Monster stat blocks, Encounter definitions, and the wiring that translates Player input into engine intents. The demo lives here.
+_Avoid_: game data, content pack, scenario
 
 **Campaign**:
 A series of connected Adventures. Out of scope for now.
