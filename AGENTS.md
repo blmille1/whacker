@@ -6,7 +6,7 @@ Issues are tracked as GitHub issues in `blmille1/whacker` (via `gh` CLI). Extern
 
 ### Triage labels
 
-Seven labels: `needs-triage`, `needs-info`, `ready-for-agent`, `ready-for-human`, `wontfix`, `in-progress`, `done`. See `docs/agents/triage-labels.md`.
+`needs-triage`, `needs-info`, `ready-for-agent`, `ready-for-human`, `wontfix`. See `docs/agents/triage.md`.
 
 ### Domain docs
 
