@@ -2,7 +2,7 @@
 
 ### Issue tracker
 
-Issues are tracked as local markdown files under `.scratch/<feature>/`. See `docs/agents/issue-tracker.md`.
+Issues are tracked as GitHub issues in `blmille1/whacker` (via `gh` CLI). External PRs are **not** a triage surface. See `docs/agents/issue-tracker.md`.
 
 ### Triage labels
 
