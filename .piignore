@@ -1,0 +1,4 @@
+# Prevent pi from reading any .env files — secrets stay secret.
+.env
+.env.*
+!.env.example

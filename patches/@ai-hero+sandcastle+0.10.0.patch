@@ -1,0 +1,22 @@
+diff --git a/node_modules/@ai-hero/sandcastle/dist/chunk-5VM5QZ26.js b/node_modules/@ai-hero/sandcastle/dist/chunk-5VM5QZ26.js
+index c4cb059..2f1f1f9 100644
+--- a/node_modules/@ai-hero/sandcastle/dist/chunk-5VM5QZ26.js
++++ b/node_modules/@ai-hero/sandcastle/dist/chunk-5VM5QZ26.js
+@@ -9,7 +9,7 @@ import { mkdtemp, writeFile, mkdir, readFile, rm, readdir, stat } from 'fs/promi
+ import { exec, execFile } from 'child_process';
+ import { randomBytes } from 'crypto';
+ 
+-createRequire(import.meta.url);
++var require = createRequire(import.meta.url);
+ 
+ // node_modules/effect/dist/esm/Effect.js
+ var Effect_exports = {};
+@@ -24958,7 +24958,7 @@ ${lines2}`);
+           yield* appendToLog(`${title} done (${elapsed3}s)`);
+           return result;
+         }),
+-        text: (message) => appendToLog(message),
++        text: (message) => Effect_exports.sync(() => require("node:fs").appendFileSync(filePath, message)),
+         toolCall: (name, formattedArgs) => appendToLog(`${name}(${formattedArgs})`)
+       };
+     })
