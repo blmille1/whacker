@@ -99,23 +99,25 @@ function isStanding(p: CombatParticipant): boolean {
   return p.character.currentHp > 0;
 }
 
-/** Advance the turn pointer to the next standing participant. Returns true if the round wrapped. */
+/**
+ * Advance the turn pointer to the next standing participant.
+ * Returns true if the turn order wrapped past the start index (new round).
+ */
 function advanceTurn(combat: Combat): boolean {
-  const n = combat.participants.length;
-  const startIdx = combat.currentTurnIndex;
-  let idx = startIdx;
+  const participantCount = combat.participants.length;
+  const startIndex = combat.currentTurnIndex;
+  let index = startIndex;
 
-  for (let i = 0; i < n; i++) {
-    idx = (idx + 1) % n;
-    if (isStanding(combat.participants[idx])) {
-      combat.currentTurnIndex = idx;
-      // Wrapped past the end of the initiative order — new round begins.
-      return idx <= startIdx;
+  for (let i = 0; i < participantCount; i++) {
+    index = (index + 1) % participantCount;
+    if (isStanding(combat.participants[index])) {
+      combat.currentTurnIndex = index;
+      return index <= startIndex;
     }
   }
 
-  // No other standing participant — combat is effectively over.
-  combat.currentTurnIndex = idx;
+  // No other standing participant found — combat is effectively over.
+  combat.currentTurnIndex = index;
   return false;
 }
 
@@ -155,10 +157,9 @@ export function getLegalIntents(combat: Combat, characterId: string): Intent[] {
   );
   if (!attacker) return intents;
 
-  // Attack: one intent per valid enemy target.
-  for (const p of combat.participants) {
-    if (p.character.name !== attacker.character.name && isStanding(p)) {
-      intents.push({ type: "attack", targetId: p.character.name });
+  for (const participant of combat.participants) {
+    if (participant.character.name !== attacker.character.name && isStanding(participant)) {
+      intents.push({ type: "attack", targetId: participant.character.name });
     }
   }
 
@@ -170,11 +171,11 @@ export function getLegalIntents(combat: Combat, characterId: string): Intent[] {
 }
 
 /**
- * Resolve an Intent for the character whose Turn it is, applying its effects
- * and advancing the turn. Returns a fresh CombatState snapshot.
+ * Resolve an Intent for the active combatant, applying its effects and
+ * advancing the turn. Returns a fresh CombatState snapshot.
  *
- * Throws if it is not the given character's turn, if the target is invalid,
- * or if the intent type is unrecognized.
+ * Throws if the active combatant is not standing, if the attack target is
+ * invalid, or if the intent type is unrecognized.
  */
 export function resolveIntent(combat: Combat, intent: Intent): CombatState {
   const active = combat.participants[combat.currentTurnIndex];
@@ -182,8 +183,6 @@ export function resolveIntent(combat: Combat, intent: Intent): CombatState {
     throw new Error("No active combatant");
   }
 
-  // Emit roundStarted when starting a new round (first turn of combat or
-  // after wrapping around the initiative order).
   if (combat.round === 0 || combat.pendingNewRound) {
     combat.round++;
     combat.pendingNewRound = false;
@@ -264,9 +263,6 @@ export function resolveIntent(combat: Combat, intent: Intent): CombatState {
     }
   }
 
-  // Advance turn before checking end — this ensures the snapshot reflects the
-  // next active combatant (or null if combat is over). If the initiative order
-  // wrapped, flag that the next resolveIntent should start a new round.
   const wrapped = advanceTurn(combat);
   if (wrapped) {
     combat.pendingNewRound = true;

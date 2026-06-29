@@ -36,8 +36,9 @@ export function runCombat(combatants: Character[]): CombatResult {
   }
 
   const finalState = getCombatState(combat);
-  const winnerNames = new Set(finalState.events.find((e) => e.type === "combatEnded")?.winnerNames ?? []);
-  const winner = combatants.filter((c) => winnerNames.has(c.name));
+  const endEvent = finalState.events.find((e) => e.type === "combatEnded");
+  const winnerNames = endEvent?.winnerNames ?? [];
+  const winner = combatants.filter((c) => winnerNames.includes(c.name));
 
   return {
     winner,

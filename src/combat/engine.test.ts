@@ -199,7 +199,6 @@ describe("engine: resolveIntent (attack)", () => {
     expect(damageEvents[0].damage).toBe(4);
     expect(damageEvents[0].hpRemaining).toBe(6);
 
-    // Goblin's HP should be reflected in the snapshot
     const goblinState = state.participants.find((p) => p.name === "Goblin");
     expect(goblinState?.currentHp).toBe(6);
   });
@@ -227,7 +226,7 @@ describe("engine: resolveIntent (attack)", () => {
     expect(missEvents.length).toBeGreaterThan(0);
 
     const goblinState = state.participants.find((p) => p.name === "Goblin");
-    expect(goblinState?.currentHp).toBe(5); // unchanged
+    expect(goblinState?.currentHp).toBe(5);
   });
 
   it("defeats a combatant at 0 HP and ends the combat", () => {
