@@ -1,7 +1,12 @@
 import type { Character } from "../character/character.js";
-import { abilityModifier } from "../character/stats.js";
-import { Dice } from "../dice/dice.js";
 import type { CombatEvent } from "./events.js";
+import {
+  createCombat,
+  getCombatState,
+  getLegalIntents,
+  isCombatOver,
+  resolveIntent,
+} from "./engine.js";
 export type { CombatEvent } from "./events.js";
 
 export interface CombatResult {
@@ -10,118 +15,33 @@ export interface CombatResult {
   events: CombatEvent[];
 }
 
-interface InitiativeEntry {
-  character: Character;
-  roll: number;
-  dexScore: number;
-  total: number;
-}
-
+/**
+ * Run a full combat to completion using the intent-based engine.
+ * Each combatant always Attacks the first available enemy — this preserves
+ * the original auto-resolution behavior while delegating to the new engine.
+ */
 export function runCombat(combatants: Character[]): CombatResult {
-  const events: CombatEvent[] = [];
+  const combat = createCombat(combatants);
 
-  // Roll initiative
-  const initiativeOrder: InitiativeEntry[] = combatants.map((c) => {
-    const roll = Dice.roll("1d20").total;
-    const dexMod = abilityModifier(c.abilityScores.dexterity);
-    const total = roll + dexMod;
-    events.push({
-      type: "initiativeRolled",
-      combatantName: c.name,
-      roll,
-      dexModifier: dexMod,
-      total,
-    });
-    return { character: c, roll, dexScore: c.abilityScores.dexterity, total };
-  });
+  while (!isCombatOver(combat)) {
+    const state = getCombatState(combat);
+    const activeName = state.activeCharacterName;
+    if (!activeName) break;
 
-  // Sort initiative: highest total, then highest DEX, then coin flip
-  initiativeOrder.sort((a, b) => {
-    if (b.total !== a.total) return b.total - a.total;
-    if (b.dexScore !== a.dexScore) return b.dexScore - a.dexScore;
-    return Math.random() < 0.5 ? 1 : -1;
-  });
+    const intents = getLegalIntents(combat, activeName);
+    const attackIntent = intents.find((i) => i.type === "attack");
+    if (!attackIntent) break;
 
-  let rounds = 0;
-
-  // Combat loop
-  let standing = initiativeOrder.filter((e) => e.character.currentHp > 0);
-  while (standing.length > 1) {
-    rounds++;
-    events.push({ type: "roundStarted", round: rounds });
-
-    for (const entry of [...initiativeOrder]) {
-      const attacker = entry.character;
-      if (attacker.currentHp <= 0) continue;
-
-      // Find first available enemy in initiative order
-      const target = initiativeOrder
-        .map((e) => e.character)
-        .find((c) => c.name !== attacker.name && c.currentHp > 0);
-
-      if (!target) break;
-
-      // Attack resolution
-      const attackRoll = Dice.roll("1d20").total;
-      const total = attackRoll + attacker.attackBonus;
-      events.push({
-        type: "attackMade",
-        attackerName: attacker.name,
-        defenderName: target.name,
-        attackRoll,
-        attackBonus: attacker.attackBonus,
-        total,
-        targetAc: target.ac,
-      });
-
-      if (total >= target.ac) {
-        // Hit
-        events.push({
-          type: "hit",
-          attackerName: attacker.name,
-          defenderName: target.name,
-        });
-
-        const damageResult = Dice.roll(attacker.damageExpression);
-        target.currentHp = Math.max(0, target.currentHp - damageResult.total);
-
-        const maxHp = target.maxHp;
-        events.push({
-          type: "damageDealt",
-          attackerName: attacker.name,
-          defenderName: target.name,
-          damage: damageResult.total,
-          hpRemaining: target.currentHp,
-          maxHp,
-        });
-
-        if (target.currentHp <= 0) {
-          events.push({
-            type: "combatantDefeated",
-            combatantName: target.name,
-          });
-        }
-      } else {
-        events.push({
-          type: "miss",
-          attackerName: attacker.name,
-          defenderName: target.name,
-        });
-      }
-    }
-
-    standing = initiativeOrder.filter((e) => e.character.currentHp > 0);
+    resolveIntent(combat, attackIntent);
   }
 
-  const survivors = initiativeOrder
-    .filter((e) => e.character.currentHp > 0)
-    .map((e) => e.character);
+  const finalState = getCombatState(combat);
+  const winnerNames = new Set(finalState.events.find((e) => e.type === "combatEnded")?.winnerNames ?? []);
+  const winner = combatants.filter((c) => winnerNames.has(c.name));
 
-  events.push({
-    type: "combatEnded",
-    winnerNames: survivors.map((c) => c.name),
-    rounds,
-  });
-
-  return { winner: survivors, rounds, events };
+  return {
+    winner,
+    rounds: finalState.round,
+    events: finalState.events,
+  };
 }

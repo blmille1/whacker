@@ -11,3 +11,11 @@ export type {
   CombatantDefeatedEvent,
   CombatEndedEvent,
 } from "../combat/events.js";
+export type { Intent, Combat, CombatState, CombatParticipantState } from "../combat/engine.js";
+export {
+  createCombat,
+  getCombatState,
+  getLegalIntents,
+  resolveIntent,
+  isCombatOver,
+} from "../combat/engine.js";
