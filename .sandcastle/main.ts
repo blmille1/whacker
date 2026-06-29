@@ -1,20 +1,19 @@
-// Parallel Planner with Review — four-phase orchestration loop
+// Plan → Implement → Review — agent-only pipeline
 //
-// This template drives a multi-phase workflow:
-//   Phase 1 (Plan):             An opus agent analyzes open issues, builds a
-//                               dependency graph, and outputs a <plan> JSON
-//                               listing unblocked issues with branch names.
-//   Phase 2 (Execute + Review): For each issue, a sandbox is created via
-//                               createSandbox(). The implementer runs first
-//                               (100 iterations). If it produces commits, a
-//                               reviewer runs in the same sandbox on the same
-//                               branch (1 iteration). All issue pipelines run
-//                               concurrently via Promise.allSettled().
-//   Phase 3 (Merge):            A single agent merges all completed branches
-//                               into the current branch.
+// This drives a single-issue-at-a-time workflow:
+//   Phase 1 (Plan):             An agent analyzes open issues labeled
+//                               ready-for-agent, builds a dependency graph,
+//                               and outputs a <plan> JSON listing unblocked
+//                               issues with branch names.
+//   Phase 2 (Execute + Review): For the selected issue, a sandbox is created
+//                               via createSandbox(). The implementer runs
+//                               first (100 iterations). If it produces
+//                               commits, a reviewer runs in the same sandbox
+//                               on the same branch.
 //
-// The outer loop repeats up to MAX_ITERATIONS times so that newly unblocked
-// issues are picked up after each round of merges.
+// No merge phase — merging into main is a human gate. When the agent
+// produces commits on its branch, the loop stops and waits for the human
+// to review and merge.
 //
 // Usage:
 //   npx tsx .sandcastle/main.ts
@@ -39,8 +38,9 @@ const planSchema = z.object({
 // Configuration
 // ---------------------------------------------------------------------------
 
-// Maximum number of plan→execute→merge cycles before stopping.
-// Raise this if your backlog is large; lower it for a quick smoke-test run.
+// Maximum number of plan→execute→review cycles before stopping.
+// Since we don't auto-merge, this is a safety valve — the loop should
+// normally exit after one iteration when the agent completes its task.
 const MAX_ITERATIONS = 10;
 
 // Hooks run inside the sandbox before the agent starts each iteration.
@@ -170,57 +170,43 @@ for (let iteration = 1; iteration <= MAX_ITERATIONS; iteration++) {
     }
   }
 
-  // Only pass branches that actually produced commits to the merge phase.
-  // An agent that ran successfully but made no commits has nothing to merge.
-  const completedIssues = settled
+  // Check which branches produced commits.
+  const completed = settled
     .map((outcome, i) => ({ outcome, issue: issues[i]! }))
     .filter(
       (entry) =>
         entry.outcome.status === "fulfilled" &&
         entry.outcome.value.commits.length > 0,
-    )
-    .map((entry) => entry.issue);
+    );
 
-  const completedBranches = completedIssues.map((i) => i.branch);
+  if (completed.length > 0) {
+    // Flip the label so a human knows it's ready for review.
+    for (const entry of completed) {
+      const { execSync } = await import("node:child_process");
+      execSync(
+        `gh issue edit ${entry.issue.id} --remove-label ready-for-agent --add-label ready-for-human`,
+        { stdio: "inherit" },
+      );
+      console.log(
+        `  #${entry.issue.id}: ready-for-agent → ready-for-human`,
+      );
+    }
 
-  console.log(
-    `\nExecution complete. ${completedBranches.length} branch(es) with commits:`,
-  );
-  for (const branch of completedBranches) {
-    console.log(`  ${branch}`);
+    // Stop here — merging into main is a human gate.
+    console.log(
+      `\nAgent produced commits on ${completed.length} branch(es). Stopping for human review.`,
+    );
+    for (const entry of completed) {
+      console.log(`  ${entry.issue.branch} — ${entry.issue.title}`);
+    }
+    console.log("\nDone. Human should review the branch and merge when ready.");
+    break;
   }
 
-  if (completedBranches.length === 0) {
-    // All agents ran but none made commits — nothing to merge this cycle.
-    console.log("No commits produced. Nothing to merge.");
-    continue;
-  }
-
-  // -------------------------------------------------------------------------
-  // Phase 3: Merge
-  //
-  // One agent merges all completed branches into the current branch,
-  // resolving any conflicts and running tests to confirm everything works.
-  //
-  // The {{BRANCHES}} and {{ISSUES}} prompt arguments are lists that the agent
-  // uses to know which branches to merge and which issues to close.
-  // -------------------------------------------------------------------------
-  await sandcastle.run({
-    hooks,
-    sandbox: docker(),
-    name: "merger",
-    maxIterations: 1,
-    agent: sandcastle.pi("openrouter/owl-alpha"),
-    promptFile: "./.sandcastle/merge-prompt.md",
-    promptArgs: {
-      // A markdown list of branch names, one per line.
-      BRANCHES: completedBranches.map((b) => `- ${b}`).join("\n"),
-      // A markdown list of issue IDs and titles, one per line.
-      ISSUES: completedIssues.map((i) => `- ${i.id}: ${i.title}`).join("\n"),
-    },
-  });
-
-  console.log("\nBranches merged.");
+  // No commits produced — the agent may have found nothing to do.
+  // Stop rather than loop forever.
+  console.log("\nNo commits produced. Stopping.");
+  break;
 }
 
-console.log("\nAll done.");
+console.log("\nRun complete.");

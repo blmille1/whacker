@@ -70,3 +70,8 @@ Once complete, output <promise>COMPLETE</promise>.
 # FINAL RULES
 
 ONLY WORK ON A SINGLE TASK.
+
+Do not push the branch.
+Do not close the issue.
+Do not edit labels.
+Do not create or edit PRs.

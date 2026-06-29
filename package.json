@@ -13,7 +13,7 @@
     "demo": "tsx src/main.ts",
     "agent": "tsx .sandcastle/main.ts",
     "build": "sandcastle docker build-image",
-    "sandcastle": "npx tsx .sandcastle/main.ts",
+    "sandcastle": "bash .sandcastle/run.sh",
     "postinstall": "patch-package"
   },
   "devDependencies": {

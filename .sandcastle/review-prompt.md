@@ -48,8 +48,8 @@ If you find improvements to make:
 
 1. Make the changes directly on this branch
 2. Run tests and type checking to ensure nothing is broken
-3. Commit describing the refinements
+3. Commit with a message starting with `RALPH Reviewer:` describing the refinements, followed by key decisions and files changed
 
-If the code is already clean and well-structured, do nothing.
+If the code is already clean and well-structured, do not change code.
 
 Once complete, output <promise>COMPLETE</promise>.
