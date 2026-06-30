@@ -11,3 +11,6 @@ Issues are tracked as GitHub issues in `blmille1/whacker` (via `gh` CLI). Extern
 ### Domain docs
 
 Single-context: `CONTEXT.md` and `docs/adr/` at the repo root. See `docs/agents/domain.md`.
+
+### Other
+If you install/upgrade an npm package, verify with `npm i`. If the package had patches, delete them.
