@@ -1,34 +1,8 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
 import { Dice } from "../dice/dice.js";
-import { createCharacter } from "../character/character.js";
 import { createCombat, getLegalIntents } from "../combat/engine.js";
 import { selectNpcIntent } from "./npcController.js";
-
-function makeCharacter(name: string, opts: {
-  dex?: number;
-  str?: number;
-  con?: number;
-  ac?: number;
-  hp?: number;
-  attackBonus?: number;
-  damage?: string;
-}) {
-  return createCharacter({
-    name,
-    abilityScores: {
-      strength: opts.str ?? 10,
-      dexterity: opts.dex ?? 10,
-      constitution: opts.con ?? 10,
-      intelligence: 10,
-      wisdom: 10,
-      charisma: 10,
-    },
-    maxHp: opts.hp ?? 10,
-    ac: opts.ac ?? 10,
-    attackBonus: opts.attackBonus ?? 2,
-    damageExpression: opts.damage ?? "1d6+1",
-  });
-}
+import { makeCharacter } from "./testHelpers.js";
 
 describe("npcController: selectNpcIntent", () => {
   let rollSpy: ReturnType<typeof vi.spyOn>;

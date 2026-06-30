@@ -1,34 +1,9 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
 import { Dice } from "../dice/dice.js";
-import { createCharacter } from "../character/character.js";
 import { runCombat } from "../combat/combat.js";
 import { autoPilotCombat } from "./autoPilot.js";
-
-function makeCharacter(name: string, opts: {
-  dex?: number;
-  str?: number;
-  con?: number;
-  ac?: number;
-  hp?: number;
-  attackBonus?: number;
-  damage?: string;
-}) {
-  return createCharacter({
-    name,
-    abilityScores: {
-      strength: opts.str ?? 10,
-      dexterity: opts.dex ?? 10,
-      constitution: opts.con ?? 10,
-      intelligence: 10,
-      wisdom: 10,
-      charisma: 10,
-    },
-    maxHp: opts.hp ?? 10,
-    ac: opts.ac ?? 10,
-    attackBonus: opts.attackBonus ?? 2,
-    damageExpression: opts.damage ?? "1d6+1",
-  });
-}
+import { makeCharacter } from "./testHelpers.js";
+import type { CombatEndedEvent } from "../combat/events.js";
 
 describe("autoPilotCombat", () => {
   let rollSpy: ReturnType<typeof vi.spyOn>;
@@ -68,10 +43,10 @@ describe("autoPilotCombat", () => {
 
     expect(result.isOver).toBe(true);
 
-    const endEvent = result.events.find((e) => e.type === "combatEnded") as any;
+    const endEvent = result.events.find((e): e is CombatEndedEvent => e.type === "combatEnded");
     expect(endEvent).toBeDefined();
-    expect(endEvent.winnerNames.length).toBeGreaterThan(0);
-    expect(endEvent.rounds).toBeGreaterThanOrEqual(1);
+    expect(endEvent!.winnerNames.length).toBeGreaterThan(0);
+    expect(endEvent!.rounds).toBeGreaterThanOrEqual(1);
   });
 
   it("produces the same event sequence as runCombat for the same dice rolls", () => {
