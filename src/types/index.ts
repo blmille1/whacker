@@ -19,3 +19,6 @@ export {
   resolveIntent,
   isCombatOver,
 } from "../combat/engine.js";
+export type { AutoPilotResult } from "../game/autoPilot.js";
+export { autoPilotCombat } from "../game/autoPilot.js";
+export { selectNpcIntent } from "../game/npcController.js";
